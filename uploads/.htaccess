@@ -1,0 +1,8 @@
+# Permitir acceso a archivos
+Order Allow,Deny
+Allow from all
+
+# Prevenir ejecución de PHP en esta carpeta
+<Files *.php>
+    Deny from all
+</Files>

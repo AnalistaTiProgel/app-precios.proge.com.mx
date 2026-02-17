@@ -1,0 +1,177 @@
+/* ================================
+   COMPONENTS.CSS
+   Componentes reutilizables
+   ================================ */
+
+
+/* ================================
+   BOTONES
+   ================================ */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Botón primario */
+.btn-primary {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: #ffffff;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(52, 152, 219, 0.35);
+}
+
+/* Botón secundario */
+.btn-secondary {
+    background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+    color: #ffffff;
+}
+
+.btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(149, 165, 166, 0.35);
+}
+
+/* Botón peligro */
+.btn-danger {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: #ffffff;
+}
+
+.btn-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(231, 76, 60, 0.35);
+}
+
+
+/* ================================
+   TARJETAS / CARDS
+   ================================ */
+.card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+}
+
+.card-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #2c3e50;
+}
+
+.card-text {
+    font-size: 0.95rem;
+    color: #6c757d;
+    line-height: 1.5;
+}
+
+
+/* ================================
+   FORMULARIOS
+   ================================ */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #34495e;
+}
+
+.form-control {
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    font-size: 0.95rem;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.15);
+}
+
+
+/* ================================
+   MENSAJES / ALERTAS
+   ================================ */
+.alert {
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.alert-success {
+    background: #27ae60;
+    color: #ffffff;
+}
+
+.alert-error {
+    background: #e74c3c;
+    color: #ffffff;
+}
+
+.alert-warning {
+    background: #f39c12;
+    color: #ffffff;
+}
+
+.alert-info {
+    background: #3498db;
+    color: #ffffff;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;   /* espacio entre título y campo */
+  font-weight: 600;
+}
+
+.form-group {
+  margin-top: 20px;     /* espacio entre cada grupo */
+}
+
+input[readonly] {
+  background-color: #f4f6f8;
+  color: #555;
+  border-color: #dcdfe3;
+  cursor: not-allowed;
+}
+/* 🔥 Fuerza botones SUCCESS siempre verdes */
+.btn.btn-success {
+  background-color: #27ae60 !important;
+  border-color: #27ae60 !important;
+  color: #ffffff !important;
+  opacity: 1 !important;
+}
+
+/* Hover */
+.btn.btn-success:hover {
+  background-color: #219150 !important;
+  border-color: #219150 !important;
+}
+
+/* Evita look transparente en submit */
+button.btn.btn-success[type="submit"] {
+  background-color: #27ae60 !important;
+}
+
+.mt-60 {
+  margin-top: 60px;
+}

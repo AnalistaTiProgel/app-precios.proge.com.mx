@@ -1,0 +1,543 @@
+/* ================================
+   REPORTES.CSS (RESPONSIVO)
+   Estilos exclusivos reportes.php
+================================ */
+
+/* ---------- Base ---------- */
+:root{
+  --bg: #f3f6fb;
+  --text: #2c3e50;
+  --muted: #6b7280;
+
+  --glass: rgba(255,255,255,.72);
+  --glass-strong: rgba(255,255,255,.82);
+  --border: rgba(255,255,255,.55);
+
+  --shadow: 0 18px 45px rgba(0,0,0,.14);
+  --shadow-sm: 0 10px 28px rgba(0,0,0,.12);
+
+  --primary: #3498db;
+  --primary-2: #2ecc71;
+  --danger: #ef4444;
+  --gray: #95a5a6;
+
+  --radius: 18px;
+}
+
+*{ box-sizing: border-box; }
+
+html, body{
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden; /* ✅ evita “cortes” por elementos fuera */
+}
+
+body{
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
+  color: var(--text);
+}
+
+/* ---------- Header ---------- */
+.header{
+  position: sticky;
+  top: 0;
+  z-index: 50;
+
+  background: rgba(255,255,255,.7);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 8px 30px rgba(0,0,0,.12);
+}
+
+.header-content{
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 14px 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.header .logo{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 900;
+  letter-spacing: -.2px;
+  font-size: 1.15rem;
+  white-space: nowrap;
+}
+
+.user-info{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap; /* ✅ permite romper en móvil */
+  justify-content: flex-end;
+}
+
+.user-name{
+  font-weight: 800;
+  color: #1f2937;
+  background: rgba(255,255,255,.6);
+  padding: 8px 12px;
+  border-radius: 999px;
+  box-shadow: 0 8px 22px rgba(0,0,0,.08);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- Dropdown (menú) ---------- */
+.dropdown{ position: relative; display: inline-block; }
+
+.dropdown-toggle{ cursor:pointer; }
+
+/* Menú */
+.dropdown-menu{
+  display:none;
+  position:absolute;
+  right:0;
+  left:auto;
+  top:100%;
+  margin-top: 8px;
+
+  background:#fff;
+  min-width: 320px;
+  max-width: calc(100vw - 24px); /* ✅ que no se salga */
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,.15);
+  padding: 8px;
+  z-index: 9999;
+}
+
+.dropdown-menu a{
+  display:block;
+  padding:10px 12px;
+  color:#2c3e50;
+  text-decoration:none;
+  border-radius:8px;
+}
+
+.dropdown-menu a:hover{ background:#f2f5f8; }
+
+/* ❌ NO usar hover en móvil (y evita que parpadee) */
+/* .dropdown:hover .dropdown-menu{ display:block; } */
+
+/* ✅ Abierto con clase (click) */
+.dropdown.is-open .dropdown-menu { display: block; }
+
+/* Mejor UX en móvil */
+@media (max-width: 768px){
+  .dropdown-menu{
+    right: 12px;
+    left: 12px;
+    min-width: unset;
+    max-width: unset;
+  }
+}
+
+
+
+/* ---------- Layout contenedor ---------- */
+.main-container{
+  max-width: 1200px;
+  margin: 18px auto 60px;
+  padding: 0 18px;
+}
+
+.page-title{
+  margin: 0;
+  font-size: 1.9rem;
+  font-weight: 950;
+  letter-spacing: -.4px;
+  color: #0f172a;
+}
+
+.badge-mini{
+  font-size:12px;
+  padding:2px 8px;
+  border-radius:999px;
+  background:#eef2ff;
+}
+
+/* ---------- HERO (título + descripción) ---------- */
+.report-hero{
+  margin-top: 18px;
+  background: var(--glass);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 18px 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.report-hero::before{
+  content:"";
+  position:absolute;
+  top:0; left:0;
+  width:100%;
+  height:6px;
+  background: linear-gradient(90deg, var(--primary), var(--primary-2));
+}
+
+.report-subtitle{
+  margin: 10px 0 0 0;
+  color:#334155;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+/* ---------- Botones ---------- */
+.btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  border: 0;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+
+  background: rgba(255,255,255,.85);
+  color: var(--text);
+  box-shadow: 0 10px 24px rgba(0,0,0,.12);
+  transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+  white-space: nowrap;
+}
+
+.btn:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(0,0,0,.16);
+}
+
+.btn-primary{
+  background: linear-gradient(135deg, var(--primary), #2b7bb3);
+  color: #fff;
+}
+
+.btn-secondary{
+  background: rgba(255,255,255,.85);
+  color: var(--text);
+}
+
+.btn-danger{
+  background: linear-gradient(135deg, var(--danger), #dc2626);
+  color: #fff;
+}
+
+.btn-gray{
+  background: var(--gray);
+  color: #fff;
+}
+
+.btn-excel{
+  background: linear-gradient(135deg, #27ae60, #1f8f4e);
+  color: #fff;
+}
+
+/* ---------- Filtros ---------- */
+.filters-container{
+  background: var(--glass);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  position: relative;
+  padding: 22px;
+  margin-top: 18px;
+}
+
+.filters-container::before{
+  content:"";
+  position:absolute;
+  top:0; left:0;
+  width:100%;
+  height:6px;
+  background: linear-gradient(90deg, var(--primary), var(--primary-2));
+}
+
+.filters-title{
+  margin: 0 0 14px;
+  font-size: 1.2rem;
+  font-weight: 950;
+}
+
+.filters-grid{
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 10px;
+}
+
+.form-group{ display: flex; flex-direction: column; gap: 8px; }
+.form-label{ font-weight: 900; color: #334155; font-size: .92rem; }
+
+.form-control{
+  width: 100%;
+  padding: 12px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,.08);
+  outline: none;
+  background: rgba(255,255,255,.88);
+  box-shadow: 0 10px 24px rgba(0,0,0,.08);
+}
+
+.form-control:focus{
+  border-color: rgba(52,152,219,.45);
+  box-shadow: 0 0 0 4px rgba(52,152,219,.16), 0 12px 26px rgba(0,0,0,.10);
+}
+
+.filter-actions{
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+/* ---------- Tabla ---------- */
+.report-container{ margin-top: 18px; }
+
+.table-container{
+  overflow-x: auto;              /* ✅ scroll horizontal */
+  -webkit-overflow-scrolling: touch;
+  background: var(--glass);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+
+.table-container::before{
+  content:"";
+  position:absolute;
+  top:0; left:0;
+  width:100%;
+  height:6px;
+  background: linear-gradient(90deg, var(--primary), var(--primary-2));
+}
+
+.data-table{
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 980px; /* escritorio */
+}
+
+.data-table thead th{
+  background: rgba(17,24,39,.90);
+  color: #fff;
+  text-align: left;
+  padding: 14px 14px;
+  font-size: .85rem;
+  letter-spacing: .3px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.data-table tbody td{
+  padding: 14px 14px;
+  border-bottom: 1px solid rgba(0,0,0,.06);
+  vertical-align: top;
+}
+
+.data-table tbody tr:hover{
+  background: rgba(255,255,255,.55);
+}
+
+.thumb{
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+}
+
+/* ---------- Encabezado por tienda (usuarios_detalle) ---------- */
+.group-row td{
+  background:#f7f9fc;
+  font-weight: 900;
+  border-top: 2px solid #e6e9ef;
+  padding: 12px 14px;
+}
+
+.group-header{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.group-title{
+  font-weight: 950;
+  line-height: 1.25;
+}
+
+.group-meta{
+  font-weight: 650;
+  opacity: .9;
+  margin-left: 10px;
+  word-break: break-word;
+}
+
+.group-comments{
+  font-weight: 650;
+}
+
+.group-comments ul{
+  margin: 8px 0 0 0;
+  padding-left: 18px;
+  font-weight: 500;
+}
+
+.group-comments li{
+  margin: 4px 0;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.comment-date{
+  opacity: .75;
+  font-size: 12px;
+  margin-left: 6px;
+}
+
+.comment-user{
+  font-weight: 900;
+}
+
+.img-empty{
+  color:#7f8c8d;
+  font-size:13px;
+  font-weight: 700;
+}
+
+/* ---------- Export buttons ---------- */
+.export-buttons{
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+/* ---------- No data ---------- */
+.no-data{
+  background: var(--glass);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 34px 22px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.no-data::before{
+  content:"";
+  position:absolute;
+  top:0; left:0;
+  width:100%;
+  height:6px;
+  background: linear-gradient(90deg, var(--primary), var(--primary-2));
+}
+
+.no-data i{ font-size: 2.2rem; opacity: .85; }
+.no-data h3{ margin: 12px 0 6px; font-size: 1.25rem; font-weight: 950; }
+.no-data p{ margin: 6px 0; color: var(--muted); font-weight: 700; }
+
+/* ================================
+   RESPONSIVE
+================================ */
+
+/* Tablet */
+@media (max-width: 980px){
+  .filters-grid{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .header-content{
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .user-info{
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .dropdown-menu{
+    right: auto;
+    left: 0;
+    min-width: 280px;
+  }
+
+  .data-table{ min-width: 900px; }
+}
+
+/* Mobile */
+@media (max-width: 520px){
+  .main-container{ padding: 0 14px; }
+
+  .page-title{
+    font-size: 1.35rem;
+    line-height: 1.15;
+  }
+
+  .report-hero{
+    padding: 14px 14px;
+  }
+
+  .report-subtitle{
+    font-size: .95rem;
+  }
+
+  .filters-container{ padding: 16px; }
+
+  .filters-grid{ grid-template-columns: 1fr; }
+
+  .filter-actions,
+  .export-buttons{
+    justify-content: center;
+  }
+
+  .btn{
+    width: 100%;
+  }
+
+  .dropdown{
+    width: 100%;
+  }
+
+  .dropdown-toggle{
+    width: 100%;
+  }
+
+  .dropdown-menu{
+    width: 100%;
+    min-width: 0;
+    left: 0;
+    right: 0;
+  }
+
+  .user-name{
+    width: 100%;
+    text-align: center;
+  }
+
+  .data-table{ min-width: 820px; } /* seguimos con scroll horizontal */
+}

@@ -1,0 +1,462 @@
+<?php
+session_start();
+
+if (!isset($_SESSION['usuario_id'])) {
+    header('Location: login.php');
+    exit;
+}
+
+$usuario_nombre = $_SESSION['usuario_nombre'] ?? '';
+require_once __DIR__ . '/database.php';
+
+
+/* =========================
+   PARAMETROS
+========================= */
+$reporte_tipo = $_GET['reporte'] ?? 'marca'; // marca | top | presentacion | usuarios | usuarios_detalle | fuera_rango
+
+$filters = [
+    'marca_filtro' => $_GET['marca'] ?? '',
+    'fecha_inicio' => $_GET['fecha_inicio'] ?? '',
+    'fecha_fin'    => $_GET['fecha_fin'] ?? '',
+    'tienda_id'    => $_GET['tienda_id'] ?? '',
+    'bloom_filtro' => $_GET['bloom'] ?? '',
+    'presentacion_filtro' => $_GET['presentacion'] ?? '',
+    'usuario_filtro' => $_GET['usuario_id'] ?? '',
+];
+
+/* =========================
+   BASE WHERE + PARAMS
+========================= */
+$where = " WHERE 1=1 ";
+$params = [];
+$types  = "";
+
+if ($filters['marca_filtro'] !== '') {
+    $where .= " AND p.marca = ? ";
+    $params[] = $filters['marca_filtro'];
+    $types .= "s";
+}
+if ($filters['bloom_filtro'] !== '') {
+    $where .= " AND p.bloom = ? ";
+    $params[] = $filters['bloom_filtro'];
+    $types .= "s";
+}
+if ($filters['presentacion_filtro'] !== '') {
+    $where .= " AND p.presentacion = ? ";
+    $params[] = $filters['presentacion_filtro'];
+    $types .= "s";
+}
+if ($filters['fecha_inicio'] !== '') {
+    $where .= " AND DATE(p.fecha_captura) >= ? ";
+    $params[] = $filters['fecha_inicio'];
+    $types .= "s";
+}
+if ($filters['fecha_fin'] !== '') {
+    $where .= " AND DATE(p.fecha_captura) <= ? ";
+    $params[] = $filters['fecha_fin'];
+    $types .= "s";
+}
+if ($filters['tienda_id'] !== '') {
+    $where .= " AND p.tienda_id = ? ";
+    $params[] = (int)$filters['tienda_id'];
+    $types .= "i";
+}
+if ($filters['usuario_filtro'] !== '') {
+    $where .= " AND p.usuario_id = ? ";
+    $params[] = (int)$filters['usuario_filtro'];
+    $types .= "i";
+}
+
+/* =========================
+   HELPERS
+========================= */
+function fmt_money($v) {
+    if ($v === null || $v === '') return 'N/A';
+    return '$' . number_format((float)$v, 2);
+}
+function photo_public_url($val) {
+    if (empty($val)) return '';
+    $v = trim((string)$val);
+    if (preg_match('#^https?://#i', $v)) return $v;
+    $v = ltrim($v, '/');
+    if (stripos($v, 'uploads/') === 0) return '/' . $v;
+    return '/uploads/' . $v;
+}
+
+/* ✅ FIX 1969: solo estas claves son fecha */
+$dateKeys  = ['fecha','primera_captura','ultima_captura'];
+$moneyKeys = ['precio_minimo','precio_maximo','precio_promedio','precio','promedio_marca'];
+$intKeys   = ['capturas','total_productos','total_registros','total_capturas','dias_activos'];
+
+/* =========================
+   CONFIG REPORTE
+========================= */
+$page_title = "Reportes de Precios";
+$extra_note = "";
+$sql = "";
+$columns = [];
+$columns_detalle_productos = [];
+$comentariosPorTienda = [];
+
+if ($reporte_tipo === 'marca') {
+    $page_title = "Reporte: Precios Promedio por Marca";
+    $sql = "SELECT 
+                p.marca,
+                COUNT(*) as total_productos,
+                MIN(p.precio) as precio_minimo,
+                MAX(p.precio) as precio_maximo,
+                AVG(p.precio) as precio_promedio,
+                MAX(DATE(p.fecha_captura)) as ultima_captura
+            FROM productos_capturados p
+            LEFT JOIN tiendas t ON p.tienda_id = t.id
+            $where
+            GROUP BY p.marca
+            ORDER BY precio_promedio DESC";
+
+    $columns = [
+        'marca' => 'Marca',
+        'total_productos' => 'Total Registros',
+        'precio_minimo' => 'Precio Mínimo',
+        'precio_maximo' => 'Precio Máximo',
+        'precio_promedio' => 'Precio Promedio',
+        'ultima_captura' => 'Última Captura'
+    ];
+}
+elseif ($reporte_tipo === 'top') {
+    $page_title = "Reporte: Top Marcas (Más caras / Más baratas)";
+
+    // OJO: para UNION usamos MISMO WHERE (con placeholders) dos veces
+    // => duplicamos params / types
+    $sql = "SELECT * FROM (
+                SELECT 
+                    'Top Caras' as grupo,
+                    p.marca,
+                    AVG(p.precio) as precio_promedio,
+                    COUNT(*) as total_registros
+                FROM productos_capturados p
+                $where
+                GROUP BY p.marca
+                ORDER BY precio_promedio DESC
+                LIMIT 10
+            ) A
+            UNION ALL
+            SELECT * FROM (
+                SELECT 
+                    'Top Baratas' as grupo,
+                    p.marca,
+                    AVG(p.precio) as precio_promedio,
+                    COUNT(*) as total_registros
+                FROM productos_capturados p
+                $where
+                GROUP BY p.marca
+                ORDER BY precio_promedio ASC
+                LIMIT 10
+            ) B";
+
+    // duplicar binds (porque el WHERE aparece 2 veces)
+    if (!empty($params)) {
+        $params = array_merge($params, $params);
+        $types  = $types . $types;
+    }
+
+    $columns = [
+        'grupo' => 'Grupo',
+        'marca' => 'Marca',
+        'precio_promedio' => 'Precio Promedio',
+        'total_registros' => 'Total Registros'
+    ];
+}
+elseif ($reporte_tipo === 'presentacion') {
+    $page_title = "Reporte: Por Presentación + Bloom (historial)";
+    $extra_note = "Agrupa por marca + bloom + presentación + fecha.";
+
+    $sql = "SELECT
+                p.marca,
+                p.bloom,
+                p.presentacion,
+                DATE(p.fecha_captura) as fecha,
+                MIN(p.precio) as precio_minimo,
+                MAX(p.precio) as precio_maximo,
+                AVG(p.precio) as precio_promedio,
+                COUNT(*) as capturas
+            FROM productos_capturados p
+            $where
+            GROUP BY p.marca, p.bloom, p.presentacion, DATE(p.fecha_captura)
+            ORDER BY fecha DESC, p.marca ASC
+            LIMIT 800";
+
+    $columns = [
+        'marca' => 'Marca',
+        'bloom' => 'Bloom',
+        'presentacion' => 'Presentación',
+        'fecha' => 'Fecha',
+        'precio_minimo' => 'Precio Mínimo',
+        'precio_maximo' => 'Precio Máximo',
+        'precio_promedio' => 'Precio Promedio',
+        'capturas' => 'Capturas'
+    ];
+}
+elseif ($reporte_tipo === 'usuarios') {
+    $page_title = "Reporte: Actividad de Usuarios (Resumen)";
+    $extra_note = "Mide capturas por usuario en el periodo seleccionado.";
+
+    $sql = "SELECT
+                u.nombre_completo as usuario,
+                COUNT(*) as total_capturas,
+                COUNT(DISTINCT DATE(p.fecha_captura)) as dias_activos,
+                MIN(DATE(p.fecha_captura)) as primera_captura,
+                MAX(DATE(p.fecha_captura)) as ultima_captura
+            FROM productos_capturados p
+            LEFT JOIN usuarios u ON p.usuario_id = u.id
+            $where
+            GROUP BY u.nombre_completo
+            ORDER BY total_capturas DESC";
+
+    $columns = [
+        'usuario' => 'Usuario',
+        'total_capturas' => 'Total Capturas',
+        'dias_activos' => 'Días Activos',
+        'primera_captura' => 'Primera Captura',
+        'ultima_captura' => 'Última Captura'
+    ];
+}
+elseif ($reporte_tipo === 'usuarios_detalle') {
+    $page_title = "Reporte: Actividad por Usuario (Desglosado)";
+    $extra_note = "Primero muestra la tienda, debajo las capturas y en el encabezado los comentarios.";
+
+    $sql = "SELECT
+                p.tienda_id,
+                u.nombre_completo as usuario,
+                t.nombre_tienda as tienda,
+                t.foto_estanteria as foto_estanteria,
+                p.marca,
+                p.bloom,
+                p.presentacion,
+                p.precio,
+                DATE(p.fecha_captura) as fecha
+            FROM productos_capturados p
+            LEFT JOIN usuarios u ON p.usuario_id = u.id
+            LEFT JOIN tiendas t ON p.tienda_id = t.id
+            $where
+            ORDER BY t.nombre_tienda ASC, p.fecha_captura DESC
+            LIMIT 900";
+
+    $columns_detalle_productos = [
+        'usuario' => 'Usuario',
+        'marca' => 'Marca',
+        'bloom' => 'Bloom',
+        'presentacion' => 'Presentación',
+        'precio' => 'Precio',
+        'fecha' => 'Fecha'
+    ];
+    $columns = $columns_detalle_productos;
+}
+elseif ($reporte_tipo === 'fuera_rango') {
+    $page_title = "Reporte: Capturas Fuera de Rango (posibles errores)";
+    $extra_note = "Precios fuera de (promedio ± 2*STDDEV) por marca + bloom + presentación.";
+
+    // ✅ stats por marca+bloom+presentacion (para comparar bien)
+    $sql = "SELECT
+                p.marca,
+                p.bloom,
+                p.presentacion,
+                t.nombre_tienda as tienda,
+                t.foto_estanteria as foto_estanteria,
+                p.precio,
+                DATE(p.fecha_captura) as fecha,
+                stats.promedio,
+                stats.std
+            FROM productos_capturados p
+            LEFT JOIN tiendas t ON p.tienda_id = t.id
+            JOIN (
+                SELECT 
+                    marca,
+                    bloom,
+                    presentacion,
+                    AVG(precio) as promedio,
+                    STDDEV_SAMP(precio) as std
+                FROM productos_capturados
+                GROUP BY marca, bloom, presentacion
+            ) stats 
+              ON p.marca = stats.marca
+             AND p.bloom = stats.bloom
+             AND p.presentacion = stats.presentacion
+            $where
+            AND stats.std IS NOT NULL
+            AND (
+                p.precio > (stats.promedio + 2*stats.std)
+                OR p.precio < (stats.promedio - 2*stats.std)
+            )
+            ORDER BY fecha DESC
+            LIMIT 600";
+
+    $columns = [
+        'marca' => 'Marca',
+        'bloom' => 'Bloom',
+        'presentacion' => 'Presentación',
+        'tienda' => 'Tienda',
+        'precio' => 'Precio',
+        'fecha' => 'Fecha',
+        'promedio' => 'Promedio',
+        'std' => 'STD',
+        'foto_estanteria' => 'Foto Estantería'
+    ];
+
+    // para que el formateo de dinero funcione
+    $moneyKeys[] = 'promedio';
+}
+else {
+    header("Location: reportes.php?reporte=marca");
+    exit;
+}
+
+/* =========================
+   EJECUTAR QUERY PRINCIPAL (con fallback sin mysqlnd)
+========================= */
+$stmt = $conn->prepare($sql);
+if (!$stmt) {
+    die("Error preparando SQL: " . $conn->error . "<br><pre>$sql</pre>");
+}
+
+if (!empty($params)) {
+    $stmt->bind_param($types, ...$params);
+}
+
+$stmt->execute();
+
+$reportes = [];
+
+if (method_exists($stmt, 'get_result')) {
+    $result = $stmt->get_result();
+    if ($result) {
+        while ($row = $result->fetch_assoc()) $reportes[] = $row;
+    }
+} else {
+    $meta = $stmt->result_metadata();
+    $fields = [];
+    $row = [];
+    $bind = [];
+
+    while ($field = $meta->fetch_field()) {
+        $fields[] = $field->name;
+        $row[$field->name] = null;
+        $bind[] = &$row[$field->name];
+    }
+    call_user_func_array([$stmt, 'bind_result'], $bind);
+
+    while ($stmt->fetch()) {
+        $tmp = [];
+        foreach ($fields as $f) $tmp[$f] = $row[$f];
+        $reportes[] = $tmp;
+    }
+}
+$stmt->close();
+
+/* =========================
+   COMENTARIOS (solo usuarios_detalle)
+========================= */
+if ($reporte_tipo === 'usuarios_detalle' && !empty($reportes)) {
+    $tiendaIds = [];
+    foreach ($reportes as $r) {
+        if (!empty($r['tienda_id'])) $tiendaIds[(int)$r['tienda_id']] = true;
+    }
+    $tiendaIds = array_keys($tiendaIds);
+
+    if (!empty($tiendaIds)) {
+        $in = implode(',', array_fill(0, count($tiendaIds), '?'));
+
+        $sqlC = "SELECT
+                    c.tienda_id,
+                    c.comentario,
+                    c.fecha_registro AS fecha,
+                    u.nombre_completo AS usuario
+                 FROM comentarios_visita c
+                 LEFT JOIN usuarios u ON c.usuario_id = u.id
+                 WHERE c.tienda_id IN ($in)";
+
+        $paramsC = $tiendaIds;
+        $typesC  = str_repeat('i', count($tiendaIds));
+
+        if ($filters['fecha_inicio'] !== '') {
+            $sqlC .= " AND DATE(c.fecha_registro) >= ? ";
+            $paramsC[] = $filters['fecha_inicio'];
+            $typesC .= "s";
+        }
+        if ($filters['fecha_fin'] !== '') {
+            $sqlC .= " AND DATE(c.fecha_registro) <= ? ";
+            $paramsC[] = $filters['fecha_fin'];
+            $typesC .= "s";
+        }
+        if ($filters['usuario_filtro'] !== '') {
+            $sqlC .= " AND c.usuario_id = ? ";
+            $paramsC[] = (int)$filters['usuario_filtro'];
+            $typesC .= "i";
+        }
+        $sqlC .= " ORDER BY c.fecha_registro DESC";
+
+        $stmtC = $conn->prepare($sqlC);
+        if ($stmtC) {
+            $stmtC->bind_param($typesC, ...$paramsC);
+            $stmtC->execute();
+
+            $res = [];
+            if (method_exists($stmtC, 'get_result')) {
+                $res = $stmtC->get_result();
+                while ($rowC = $res->fetch_assoc()) {
+                    $tid = (int)($rowC['tienda_id'] ?? 0);
+                    if (!$tid) continue;
+                    $comentariosPorTienda[$tid][] = [
+                        'fecha' => $rowC['fecha'] ?? '',
+                        'usuario' => $rowC['usuario'] ?? '—',
+                        'comentario' => $rowC['comentario'] ?? ''
+                    ];
+                }
+            } else {
+                $stmtC->bind_result($tienda_id_c, $comentario_c, $fecha_c, $usuario_c);
+                while ($stmtC->fetch()) {
+                    $tid = (int)$tienda_id_c;
+                    if (!$tid) continue;
+                    $comentariosPorTienda[$tid][] = [
+                        'fecha' => $fecha_c ?? '',
+                        'usuario' => $usuario_c ?? '—',
+                        'comentario' => $comentario_c ?? ''
+                    ];
+                }
+            }
+            $stmtC->close();
+        }
+    }
+}
+
+/* =========================
+   LISTAS PARA FILTROS
+========================= */
+$marcas = [];
+$r = $conn->query("SELECT DISTINCT marca FROM productos_capturados ORDER BY marca");
+if ($r) while ($row = $r->fetch_assoc()) $marcas[] = $row['marca'];
+
+$tiendas = [];
+$r = $conn->query("SELECT id, nombre_tienda FROM tiendas ORDER BY nombre_tienda");
+if ($r) while ($row = $r->fetch_assoc()) $tiendas[] = $row;
+
+$blooms = [];
+$r = $conn->query("SELECT DISTINCT bloom FROM productos_capturados ORDER BY bloom");
+if ($r) while ($row = $r->fetch_assoc()) $blooms[] = $row['bloom'];
+
+$presentaciones = [];
+$r = $conn->query("SELECT DISTINCT presentacion FROM productos_capturados ORDER BY presentacion");
+if ($r) while ($row = $r->fetch_assoc()) $presentaciones[] = $row['presentacion'];
+
+$usuarios = [];
+$r = $conn->query("SELECT id, nombre_completo FROM usuarios WHERE activo = 1 ORDER BY nombre_completo");
+if ($r) while ($row = $r->fetch_assoc()) $usuarios[] = $row;
+
+$conn->close();
+
+/* =========================
+   RUTAS PARA VISTA
+========================= */
+$self = 'reportes.php'; // para que los links siempre apunten bien al controller
+
+include __DIR__ . '/views/reportes_view.php';

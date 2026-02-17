@@ -1,0 +1,104 @@
+/* ================================
+   VENDOR.CSS
+   Estilos de librerías externas
+   NO agregar estilos propios aquí
+   ================================ */
+
+/* =====================================================
+   SWEETALERT2 – Ajustes visuales (override permitido)
+   ===================================================== */
+
+/* Contenedor principal */
+.swal2-popup {
+    border-radius: 15px !important;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+}
+
+/* Título */
+.swal2-title {
+    font-weight: 600 !important;
+    color: #2c3e50 !important;
+}
+
+/* Texto */
+.swal2-html-container {
+    color: #5a6c7d !important;
+}
+
+/* Botón confirmar */
+.swal2-confirm {
+    background: linear-gradient(135deg, #27ae60, #2ecc71) !important;
+    border-radius: 25px !important;
+    padding: 12px 30px !important;
+    font-weight: 600 !important;
+    border: none !important;
+    box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3) !important;
+}
+
+/* Botón cancelar */
+.swal2-cancel {
+    background: linear-gradient(135deg, #95a5a6, #7f8c8d) !important;
+    border-radius: 25px !important;
+    padding: 12px 30px !important;
+    font-weight: 600 !important;
+    border: none !important;
+    box-shadow: 0 4px 15px rgba(149, 165, 166, 0.3) !important;
+}
+
+/* Iconos */
+.swal2-icon.swal2-success {
+    border-color: #27ae60 !important;
+}
+
+.swal2-success [class^='swal2-success-line'] {
+    background-color: #27ae60 !important;
+}
+
+.swal2-icon.swal2-error {
+    border-color: #e74c3c !important;
+}
+
+.swal2-icon.swal2-error [class^='swal2-x-mark-line'] {
+    background-color: #e74c3c !important;
+}
+
+.swal2-icon.swal2-warning {
+    border-color: #f39c12 !important;
+    color: #f39c12 !important;
+}
+
+.swal2-icon.swal2-info {
+    border-color: #3498db !important;
+    color: #3498db !important;
+}
+
+/* Loading */
+.swal2-loading {
+    border-color: #3498db transparent #3498db transparent !important;
+}
+
+/* =====================================================
+   DATATABLES (si lo usas ahora o después)
+   ===================================================== */
+
+.dataTables_wrapper .dataTables_filter input {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+}
+
+.dataTables_wrapper .dataTables_length select {
+    padding: 6px;
+    border-radius: 6px;
+}
+
+/* =====================================================
+   FONT AWESOME (opcional tweaks)
+   ===================================================== */
+
+.fa,
+.fas,
+.far,
+.fab {
+    line-height: 1;
+}

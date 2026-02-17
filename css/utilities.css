@@ -1,0 +1,168 @@
+/* ================================
+   UTILITIES.CSS
+   Clases utilitarias reutilizables
+   ================================ */
+
+
+/* ===== VISIBILIDAD ===== */
+.hidden {
+    display: none !important;
+}
+
+.visible {
+    display: block !important;
+}
+
+
+/* ===== TEXTO ===== */
+.text-center { text-align: center !important; }
+.text-left   { text-align: left !important; }
+.text-right  { text-align: right !important; }
+
+.text-bold      { font-weight: 700 !important; }
+.text-semibold  { font-weight: 600 !important; }
+.text-muted     { color: #6c757d !important; }
+
+.text-primary { color: #3498db !important; }
+.text-success { color: #27ae60 !important; }
+.text-danger  { color: #e74c3c !important; }
+.text-warning { color: #f39c12 !important; }
+
+
+/* ===== ESPACIADOS ===== */
+/* Margin top */
+.mt-5  { margin-top: 5px !important; }
+.mt-10 { margin-top: 10px !important; }
+.mt-15 { margin-top: 15px !important; }
+.mt-20 { margin-top: 20px !important; }
+.mt-30 { margin-top: 30px !important; }
+
+/* Margin bottom */
+.mb-5  { margin-bottom: 5px !important; }
+.mb-10 { margin-bottom: 10px !important; }
+.mb-15 { margin-bottom: 15px !important; }
+.mb-20 { margin-bottom: 20px !important; }
+.mb-30 { margin-bottom: 30px !important; }
+
+/* Margin horizontal */
+.ml-10 { margin-left: 10px !important; }
+.mr-10 { margin-right: 10px !important; }
+
+/* Padding */
+.pt-10 { padding-top: 10px !important; }
+.pt-20 { padding-top: 20px !important; }
+.pb-10 { padding-bottom: 10px !important; }
+.pb-20 { padding-bottom: 20px !important; }
+
+
+/* ===== FLEX ===== */
+.flex {
+    display: flex !important;
+}
+
+.flex-center {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+.flex-between {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
+.flex-column {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.flex-wrap {
+    flex-wrap: wrap !important;
+}
+
+/* Gaps */
+.gap-5  { gap: 5px !important; }
+.gap-10 { gap: 10px !important; }
+.gap-15 { gap: 15px !important; }
+.gap-20 { gap: 20px !important; }
+
+
+/* ===== WIDTH ===== */
+.w-100  { width: 100% !important; }
+.w-auto { width: auto !important; }
+
+.max-w-400 { max-width: 400px !important; }
+.max-w-600 { max-width: 600px !important; }
+.max-w-800 { max-width: 800px !important; }
+
+
+/* ===== BORDES ===== */
+.rounded-5  { border-radius: 5px !important; }
+.rounded-10 { border-radius: 10px !important; }
+.rounded-15 { border-radius: 15px !important; }
+.rounded-circle { border-radius: 50% !important; }
+
+
+/* ===== CURSOR ===== */
+.cursor-pointer  { cursor: pointer !important; }
+.cursor-disabled { cursor: not-allowed !important; }
+
+
+/* ===== OPACIDAD ===== */
+.opacity-50 { opacity: 0.5 !important; }
+.opacity-75 { opacity: 0.75 !important; }
+
+
+/* ===== SOMBRAS ===== */
+.shadow-sm {
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1) !important;
+}
+
+.shadow-md {
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important;
+}
+
+.shadow-lg {
+    box-shadow: 0 12px 30px rgba(0,0,0,0.25) !important;
+}
+
+
+/* ===== BACKGROUNDS ===== */
+.bg-white   { background: #ffffff !important; }
+.bg-light   { background: #f8f9fa !important; }
+
+.bg-primary { background: #3498db !important; color: #ffffff !important; }
+.bg-success { background: #27ae60 !important; color: #ffffff !important; }
+.bg-danger  { background: #e74c3c !important; color: #ffffff !important; }
+.bg-warning { background: #f39c12 !important; color: #ffffff !important; }
+
+/* Fuerza la vista previa aunque exista .hidden */
+#vistaPreviaContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;      /* 👈 centra imagen y botón */
+    justify-content: center;
+    gap: 12px;
+    padding: 16px;
+    border-radius: 14px;
+
+    /* efecto glass */
+    background: rgba(255, 255, 255, 0.123);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+}
+
+#vistaPrevia {
+    max-width: 420px;
+    max-height: 260px;
+    object-fit: contain;     /* 👈 no se deforma */
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.18);
+}
+
+/* Botón eliminar */
+#btnQuitarFoto {
+    align-self: center;      /* 👈 asegura centrado */
+    padding: 8px 18px;
+}

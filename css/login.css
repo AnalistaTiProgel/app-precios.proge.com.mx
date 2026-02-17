@@ -1,0 +1,122 @@
+/* ================================
+   LOGIN.CSS
+   Estilos exclusivos del login
+   ================================ */
+
+
+/* ================================
+   CONTENEDOR PRINCIPAL
+   ================================ */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+
+/* ================================
+   CAJA DE LOGIN
+   ================================ */
+.login-box {
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 15px;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+
+/* ================================
+   LOGO LOGIN (NO HEADER)
+   ================================ */
+.login-box .company-logo {
+    width: 180px;
+    margin: 0 auto 20px;
+}
+
+.login-box .company-logo img {
+    width: 100%;
+    max-height: 130px;
+    object-fit: contain;
+}
+
+
+/* ================================
+   TÍTULOS
+   ================================ */
+.login-title {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #2c3e50, #3498db);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.login-subtitle {
+    color: #7f8c8d;
+    margin-bottom: 30px;
+}
+
+
+/* ================================
+   INPUTS
+   ================================ */
+.password-input {
+    width: 100%;
+    padding: 15px;
+    border-radius: 10px;
+    border: 2px solid #e9ecef;
+    font-size: 16px;
+    margin-bottom: 20px;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.password-input:focus {
+    border-color: #2ecc71;
+    box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.2);
+}
+
+
+/* ================================
+   BOTÓN LOGIN
+   ================================ */
+.login-btn {
+    width: 100%;
+    padding: 15px 30px;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff;
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.login-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(39, 174, 96, 0.35);
+}
+
+.login-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 10px rgba(39, 174, 96, 0.25);
+}
+
+
+/* ================================
+   MENSAJE DE ERROR
+   ================================ */
+.login-error {
+    background: #e74c3c;
+    color: #ffffff;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
