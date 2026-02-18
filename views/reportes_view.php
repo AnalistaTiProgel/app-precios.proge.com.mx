@@ -1,11 +1,5 @@
 <?php
-// Esta vista SOLO pinta.
-// Variables esperadas desde reportes.php:
-// $page_title, $extra_note, $reporte_tipo, $self
-// $usuario_nombre, $filters, $usuarios, $marcas, $blooms, $presentaciones, $tiendas
-// $columns, $columns_detalle_productos, $reportes, $comentariosPorTienda
-// helpers: fmt_money(), photo_public_url()
-// keys: $moneyKeys, $dateKeys, $intKeys
+
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -17,12 +11,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- ✅ Como esta vista está en /views, subimos 1 nivel -->
-    <link rel="stylesheet" href="../css/base.css">
-    <link rel="stylesheet" href="../css/layout.css">
-    <link rel="stylesheet" href="../css/components.css">
-    <link rel="stylesheet" href="../css/utilities.css">
-    <link rel="stylesheet" href="../css/principal.css">
-    <link rel="stylesheet" href="../css/reportes.css">
+    <link rel="stylesheet" href="./css/base.css">
+    <link rel="stylesheet" href="./css/layout.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/utilities.css">
+    <link rel="stylesheet" href="./css/principal.css">
+    <link rel="stylesheet" href="./css/reportes.css">
 </head>
 <body>
 
@@ -40,7 +34,6 @@
   </button>
 
   <div class="dropdown-menu" id="menuReportes" role="menu" aria-labelledby="btnReportes">
-
                     <a href="<?php echo htmlspecialchars($self); ?>?reporte=marca"><i class="fas fa-tags"></i> Precios por Marca</a>
                     <a href="<?php echo htmlspecialchars($self); ?>?reporte=top"><i class="fas fa-ranking-star"></i> Top Caras / Baratas</a>
                     <a href="<?php echo htmlspecialchars($self); ?>?reporte=presentacion"><i class="fas fa-boxes-stacked"></i> Por Presentación + Bloom</a>
@@ -211,44 +204,66 @@
                         ?>
                             <tr class="group-row">
                                 <td colspan="<?php echo (int)$colspan; ?>">
-                                    <div class="group-header">
-                                        <div class="group-title">
-                                            🏪 <?php echo htmlspecialchars($data['nombre']); ?>
-                                            <span class="group-meta">
-                                                <?php if ($fotoUrl): ?>
-                                                    | <a href="<?php echo htmlspecialchars($fotoUrl); ?>" target="_blank" rel="noopener noreferrer">Ver foto</a>
+
+                                    <!-- ✅ HEADER CON FOTO A LA DERECHA -->
+                                    <div class="group-header" style="display:flex; justify-content:space-between; align-items:flex-start; gap:20px;">
+
+                                        <!-- IZQUIERDA: TITULO + META + COMENTARIOS -->
+                                        <div style="flex:1;">
+                                            <div class="group-title">
+                                                🏪 <?php echo htmlspecialchars($data['nombre']); ?>
+                                                <span class="group-meta">
+                                                    | Registros: <?php echo count($data['rows']); ?>
+                                                </span>
+                                            </div>
+
+                                            <div class="group-comments" style="margin-top:8px;">
+                                                <b>Comentarios:</b>
+                                                <?php if (!empty($comentarios)): ?>
+                                                    <ul>
+                                                        <?php
+                                                        $max = 3; $i = 0;
+                                                        foreach ($comentarios as $c) {
+                                                            $i++; if ($i > $max) break;
+                                                            $f = !empty($c['fecha']) ? date('d/m/Y H:i', strtotime($c['fecha'])) : '';
+                                                            $u = $c['usuario'] ?? '—';
+                                                            $txt = trim((string)($c['comentario'] ?? ''));
+                                                        ?>
+                                                            <li>
+                                                                <span class="comment-user"><?php echo htmlspecialchars($u); ?></span>:
+                                                                <?php echo htmlspecialchars($txt); ?>
+                                                                <?php if ($f): ?>
+                                                                    <span class="comment-date">(<?php echo htmlspecialchars($f); ?>)</span>
+                                                                <?php endif; ?>
+                                                            </li>
+                                                        <?php } ?>
+                                                    </ul>
                                                 <?php else: ?>
-                                                    | <span class="img-empty">Sin foto</span>
+                                                    <div class="img-empty">Sin comentarios</div>
                                                 <?php endif; ?>
-                                                | Registros: <?php echo count($data['rows']); ?>
-                                            </span>
+                                            </div>
                                         </div>
 
-                                        <div class="group-comments">
-                                            <b>Comentarios:</b>
-                                            <?php if (!empty($comentarios)): ?>
-                                                <ul>
-                                                    <?php
-                                                    $max = 3; $i = 0;
-                                                    foreach ($comentarios as $c) {
-                                                        $i++; if ($i > $max) break;
-                                                        $f = !empty($c['fecha']) ? date('d/m/Y H:i', strtotime($c['fecha'])) : '';
-                                                        $u = $c['usuario'] ?? '—';
-                                                        $txt = trim((string)($c['comentario'] ?? ''));
-                                                    ?>
-                                                        <li>
-                                                            <span class="comment-user"><?php echo htmlspecialchars($u); ?></span>:
-                                                            <?php echo htmlspecialchars($txt); ?>
-                                                            <?php if ($f): ?>
-                                                                <span class="comment-date">(<?php echo htmlspecialchars($f); ?>)</span>
-                                                            <?php endif; ?>
-                                                        </li>
-                                                    <?php } ?>
-                                                </ul>
+                                        <!-- DERECHA: FOTO -->
+                                        <div>
+                                            <?php if ($fotoUrl): ?>
+                                                <a href="<?php echo htmlspecialchars($fotoUrl); ?>" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">
+                                                    <img
+                                                        src="<?php echo htmlspecialchars($fotoUrl); ?>"
+                                                        loading="lazy"
+                                                        decoding="async"
+                                                        width="120"
+                                                        height="120"
+                                                        alt="foto estantería"
+                                                        class="thumb"
+                                                        style="border-radius:10px; object-fit:cover;"
+                                                    >
+                                                </a>
                                             <?php else: ?>
-                                                <div class="img-empty">Sin comentarios</div>
+                                                <span class="img-empty">Sin foto</span>
                                             <?php endif; ?>
                                         </div>
+
                                     </div>
                                 </td>
                             </tr>
@@ -262,8 +277,10 @@
 
                                             if ($key === 'precio') {
                                                 echo fmt_money($val);
+
                                             } elseif ($key === 'fecha') {
                                                 echo !empty($val) ? date('d/m/Y', strtotime($val)) : 'N/A';
+
                                             } else {
                                                 echo htmlspecialchars((string)$val);
                                             }
